@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6e0a85e0e4244f199b2e74b0be8aa81, type: 3}
+  m_Name: LightEnemyStats
+  m_EditorClassIdentifier: 
+  type: 0
+  maxHP: 100
+  moveSpeed: 3.5
+  damage: 10
+  fireRate: 1
+  accuracy: 0.7
+  attackRange: 10
+  hitChance: 0.6
+  headshotChance: 0.2
+  bodyDamage: 10
+  headDamage: 25
+  desiredDistance: 3
+  idealDistance: 6
