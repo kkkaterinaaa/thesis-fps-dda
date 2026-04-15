@@ -66,7 +66,9 @@ public abstract class EnemyBase : MonoBehaviour
     float dist = Vector3.Distance(transform.position, player.position);
     if (dist > attackRange) return;
 
-    fireCooldown = fireRate;
+    float aggression = DifficultyState.SpawnIntensity;
+    aggression = Mathf.Clamp(aggression, 0.25f, 4f);
+    fireCooldown = fireRate / aggression;
 
     Transform spawn = (muzzle != null) ? muzzle : transform;
     Vector3 aimPoint = player.position + Vector3.up * aimHeight;
@@ -98,7 +100,9 @@ public abstract class EnemyBase : MonoBehaviour
             if (playerHealth == null) continue;
 
             bool isHead = hits[i].collider.CompareTag("Head");
-            float damage = isHead ? stats.headDamage : stats.bodyDamage;
+            float dmgMult = DifficultyState.EnemyDamageMult;
+            dmgMult = Mathf.Clamp(dmgMult, 0.1f, 10f);
+            float damage = (isHead ? stats.headDamage : stats.bodyDamage) * dmgMult;
             Debug.Log(isHead ? "Enemy HEADSHOT" : "Enemy body hit");
             playerHealth.TakeDamage(damage);
             break;
