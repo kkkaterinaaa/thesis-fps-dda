@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TelemetryManager : MonoBehaviour
 {
@@ -62,7 +63,21 @@ public class TelemetryManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
         StartSession();
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (ended)
+            StartSession();
     }
 
     private void StartSession()
@@ -73,6 +88,8 @@ public class TelemetryManager : MonoBehaviour
         data = new SessionData();
         data.sessionId = Guid.NewGuid().ToString("N");
         data.startedAtUtc = DateTime.UtcNow.ToString("o");
+
+        RunSessionEvents.RaiseRunStarted();
     }
 
     void OnApplicationQuit()
@@ -91,8 +108,12 @@ public class TelemetryManager : MonoBehaviour
 
         ComputeDerived();
 
+        string json = JsonUtility.ToJson(data, true);
+
+        RunSessionEvents.RaiseRunEnded(json);
+
         if (writeJsonFile)
-            WriteJson();
+            WriteJson(json);
 
         if (logSummaryToConsole)
             Debug.Log($"Telemetry: session={data.sessionId} dur={data.durationSeconds:0.0}s acc={data.accuracy:0.00} kills={data.enemiesKilled} dmgTaken={data.damageTaken:0.##} score={data.skillScore:0.0}");
@@ -125,6 +146,27 @@ public class TelemetryManager : MonoBehaviour
             string path = Path.Combine(folder, fileName);
 
             string json = JsonUtility.ToJson(data, true);
+            File.WriteAllText(path, json);
+
+            if (logSummaryToConsole)
+                Debug.Log($"Telemetry written: {path}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Telemetry write failed: {e.Message}");
+        }
+    }
+
+    private void WriteJson(string json)
+    {
+        try
+        {
+            string folder = GetOutputFolder();
+            Directory.CreateDirectory(folder);
+
+            string fileName = $"telemetry_{DateTime.UtcNow:yyyyMMdd_HHmmss}_{data.sessionId}.json";
+            string path = Path.Combine(folder, fileName);
+
             File.WriteAllText(path, json);
 
             if (logSummaryToConsole)

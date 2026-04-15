@@ -23,7 +23,9 @@ public class EnemyController : MonoBehaviour
         agent.speed = stats.moveSpeed;
 
         var hp = GetComponent<Health>();
-        hp.SetMax(stats.maxHP);
+        float hpMult = DifficultyState.EnemyHPMult;
+        hpMult = Mathf.Clamp(hpMult, 0.1f, 10f);
+        hp.SetMax(stats.maxHP * hpMult);
 
         var baseAI = GetComponent<EnemyBase>();
         if (baseAI != null)
