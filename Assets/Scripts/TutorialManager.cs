@@ -10,6 +10,7 @@ public class TutorialManager : MonoBehaviour
         CollectArmor,
         KillWithKnife,
         CollectMedkit,
+        CollectPistol,
         KillWithPistol,
         CollectMagazine
     }
@@ -28,6 +29,7 @@ public class TutorialManager : MonoBehaviour
         new Objective { type = ObjectiveType.CollectArmor,   message = "Find and collect armor" },
         new Objective { type = ObjectiveType.KillWithKnife,  message = "Kill enemy using knife" },
         new Objective { type = ObjectiveType.CollectMedkit,  message = "Find and collect first aid kit" },
+        new Objective { type = ObjectiveType.CollectPistol,  message = "Find and collect pistol" },
         new Objective { type = ObjectiveType.KillWithPistol, message = "Kill enemy using pistol" },
         new Objective { type = ObjectiveType.CollectMagazine,message = "Find and collect ammo magazine" },
     };
@@ -98,5 +100,12 @@ public class TutorialManager : MonoBehaviour
 
         if (completedPanel != null)
             completedPanel.SetActive(true);
+
+        if (TelemetryManager.Instance != null)
+            TelemetryManager.Instance.EndSession("win");
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        Time.timeScale = 0f;
     }
 }

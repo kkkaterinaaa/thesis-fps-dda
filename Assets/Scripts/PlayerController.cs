@@ -38,6 +38,8 @@ public class PlayerController : MonoBehaviour
 
     void HandleMouseLook()
     {
+        if (Cursor.lockState != CursorLockMode.Locked) return;
+
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
@@ -114,18 +116,5 @@ public class PlayerController : MonoBehaviour
             cam.fieldOfView = 90f;
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Debug.Log("Перезарядка оружия...");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            Debug.Log("Оружие 1 выбрано.");
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            Debug.Log("Оружие 2 выбрано.");
-        }
     }
 }

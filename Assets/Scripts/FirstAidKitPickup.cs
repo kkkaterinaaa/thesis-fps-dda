@@ -9,7 +9,7 @@ public class FirstAidKitPickup : MonoBehaviour
         var playerHealth = other.GetComponentInParent<PlayerHealth>();
         if (playerHealth == null) return;
 
-        if (playerHealth.CurrentHealth > playerHealth.maxHealth - healAmount)
+        if (playerHealth.CurrentHealth >= playerHealth.maxHealth)
             return;
 
         float before = playerHealth.CurrentHealth;
