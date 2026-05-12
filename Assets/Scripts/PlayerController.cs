@@ -6,8 +6,14 @@ public class PlayerController : MonoBehaviour
     public float sprintSpeed = 7f;
     public float crouchSpeed = 2f;
     public float mouseSensitivity = 2f;
-    public float jumpHeight = 2f;
-    public float gravity = -9.81f;
+    public float jumpHeight = 1.2f;
+    public float gravity = -20f;
+
+    [Header("Jump feel")]
+    public float coyoteTime = 0.12f;
+    public float jumpBufferTime = 0.12f;
+    private float coyoteTimer;
+    private float jumpBufferTimer;
 
     private CharacterController controller;
     private Camera cam;
@@ -20,6 +26,9 @@ public class PlayerController : MonoBehaviour
     private float crouchHeight = 0.9f;
     private float standHeight = 2f;
 
+    [Header("Audio")]
+    public PlayerAudio playerAudio;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -27,6 +36,8 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         originalHeight = controller.height;
+
+        if (playerAudio == null) playerAudio = GetComponent<PlayerAudio>();
     }
 
     void Update()
@@ -57,35 +68,50 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = transform.right * x + transform.forward * z;
 
+        bool sprinting = Input.GetKey(KeyCode.LeftShift);
         float currentSpeed = speed;
-
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            currentSpeed = sprintSpeed;
-        }
-
-        if (isCrouching)
-        {
-            currentSpeed = crouchSpeed;
-        }
+        if (sprinting) currentSpeed = sprintSpeed;
+        if (isCrouching) currentSpeed = crouchSpeed;
 
         controller.Move(move * currentSpeed * Time.deltaTime);
 
-        if (controller.isGrounded)
-        {
+        bool grounded = controller.isGrounded;
+
+        if (grounded) coyoteTimer = coyoteTime;
+        else          coyoteTimer -= Time.deltaTime;
+
+        if (Input.GetButtonDown("Jump")) jumpBufferTimer = jumpBufferTime;
+        else                             jumpBufferTimer -= Time.deltaTime;
+
+        bool jumped = false;
+        if (grounded && velocity.y < 0f)
             velocity.y = -2f;
 
-            if (Input.GetButtonDown("Jump"))
-            {
-                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            }
-        }
-        else
+        if (jumpBufferTimer > 0f && coyoteTimer > 0f)
         {
-            velocity.y += gravity * Time.deltaTime;
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            jumped = true;
+            jumpBufferTimer = 0f;
+            coyoteTimer = 0f;
         }
 
+        if (!grounded)
+            velocity.y += gravity * Time.deltaTime;
+
         controller.Move(velocity * Time.deltaTime);
+
+        if (playerAudio != null)
+        {
+            float hSpeed = move.magnitude * currentSpeed;
+            PlayerAudio.MotionKind kind;
+            if (hSpeed < 0.1f)       kind = PlayerAudio.MotionKind.Idle;
+            else if (isCrouching)    kind = PlayerAudio.MotionKind.Crouch;
+            else if (sprinting)      kind = PlayerAudio.MotionKind.Sprint;
+            else                     kind = PlayerAudio.MotionKind.Walk;
+
+            playerAudio.TickFootsteps(controller.isGrounded, hSpeed, kind);
+            if (jumped) playerAudio.PlayJump();
+        }
     }
 
     void HandleActions()

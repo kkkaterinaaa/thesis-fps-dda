@@ -12,6 +12,26 @@ public class Health : MonoBehaviour
 
     public System.Action OnDeath;       // Событие смерти
 
+    [Header("Audio")]
+    public AudioClip hitClip;
+    public AudioClip deathClip;
+    [Range(0f, 1f)] public float hitVolume = 0.8f;
+    [Range(0f, 1f)] public float deathVolume = 0.9f;
+    private AudioSource audioSource;
+
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 1f;
+            audioSource.minDistance = 2f;
+            audioSource.maxDistance = 30f;
+        }
+    }
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -43,7 +63,19 @@ public class Health : MonoBehaviour
             if (GetComponent<EnemyBase>() != null || GetComponent<EnemyController>() != null || GetComponent<EnemyDeath>() != null)
                 TelemetryManager.RecordEnemyKilled();
 
+            if (deathClip != null)
+                AudioSource.PlayClipAtPoint(deathClip, transform.position, deathVolume);
+
             Debug.Log($"{gameObject.name} died!");
+        }
+        else
+        {
+            if (hitClip != null && audioSource != null)
+                audioSource.PlayOneShot(hitClip, hitVolume);
+
+            var flash = GetComponent<HitFlash>();
+            if (flash == null) flash = GetComponentInChildren<HitFlash>();
+            if (flash != null) flash.Flash();
         }
     }
 

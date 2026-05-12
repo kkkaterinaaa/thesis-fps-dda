@@ -42,6 +42,9 @@ public class PlayerHealth : MonoBehaviour
 
         currentHealth -= damageToHealth;
 
+        if (DamageFlash.Instance != null)
+            DamageFlash.Instance.Flash(amount);
+
         TelemetryManager.RecordPlayerDamage(amount, blocked, damageToHealth);
 
         if (logDamage)

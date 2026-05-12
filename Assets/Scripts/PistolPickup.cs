@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class PistolPickup : MonoBehaviour
 {
+    [Header("Audio")]
+    public AudioClip pickupClip;
+    [Range(0f, 1f)] public float pickupVolume = 0.9f;
+
     void OnTriggerEnter(Collider other)
     {
         var switcher = other.GetComponentInParent<WeaponSwitcher>();
@@ -17,6 +21,12 @@ public class PistolPickup : MonoBehaviour
 
         switcher.UnlockPistol();
         TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.CollectPistol);
+        if (pickupClip != null)
+            AudioSource.PlayClipAtPoint(pickupClip, transform.position, pickupVolume);
+
+        if (!switcher.HasScrolls && HintUI.Instance != null)
+            HintUI.Instance.Show("Find scrolls to cast more spells");
+
         Destroy(gameObject);
     }
 }

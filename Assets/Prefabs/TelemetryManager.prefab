@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8957950454828420220
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1997187905445058745}
+  - component: {fileID: 8188813659069107143}
+  - component: {fileID: 2361968560434570965}
+  - component: {fileID: 7076222668586964212}
+  m_Layer: 0
+  m_Name: TelemetryManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1997187905445058745
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8957950454828420220}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 937.50714, y: 556.01556, z: 22295.768}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8188813659069107143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8957950454828420220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64a2e536391c24f7698856c75eee6dd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  writeJsonFile: 1
+  logSummaryToConsole: 1
+  outputFolderOverride: 
+--- !u!114 &2361968560434570965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8957950454828420220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 023928d84c07b42db9b8da78d64e888d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  modelKey: linucb_dda_v1
+  settings: {fileID: 11400000, guid: 3a5b36c131abf4cfeab996fb3ae1002e, type: 2}
+  actionSpace: {fileID: 11400000, guid: d876af96928084289b548570f65268be, type: 2}
+  reward: {fileID: 11400000, guid: b5eb3b3ba1a95472fab7f655e29e9be3, type: 2}
+  playerIdProvider: {fileID: 0}
+  logDecisions: 1
+  decisionLogFileName: dda_decisions.jsonl
+--- !u!114 &7076222668586964212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8957950454828420220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f56cb7116ac64aa9a9b733141fa7055, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ddaModule: {fileID: 0}
