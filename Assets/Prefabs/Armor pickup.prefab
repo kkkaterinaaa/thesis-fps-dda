@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6038997616703647063}
   - component: {fileID: 8019460466398866040}
   - component: {fileID: 15523961557664817}
+  - component: {fileID: 5930017767448382776}
   m_Layer: 0
   m_Name: Armor pickup
   m_TagString: Untagged
@@ -101,7 +102,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -147,3 +148,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   armorAmount: 50
+  fillToMax: 1
+  pickupClip: {fileID: 8300000, guid: a1f850f2f0c584088b264b3d4d77ff63, type: 3}
+  pickupVolume: 0.9
+--- !u!114 &5930017767448382776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1572083960647552789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8f8502c520bd44dcb9aef58f8308342, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  addLight: 1
+  lightColor: {r: 0.48406905, g: 0.9245283, b: 0.89375323, a: 1}
+  lightIntensity: 1.2
+  lightRange: 2.5
+  pulseSpeed: 2
+  pulseAmount: 0.35
+  bob: 1
+  bobAmplitude: 0.12
+  bobSpeed: 1.5
+  rotate: 1
+  rotateSpeed: 40

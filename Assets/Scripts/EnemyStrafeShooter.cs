@@ -25,10 +25,8 @@ public class EnemyStrafeShooter : EnemyBase
                 agent.isStopped = false;
                 agent.SetDestination(targetPos);
             }
-            return;
         }
-
-        if (allowMovement)
+        else if (allowMovement)
         {
             Vector3 right = Quaternion.Euler(0, 90, 0) * (player.position - transform.position).normalized;
             Vector3 orbit = transform.position + right * orbitOffset;

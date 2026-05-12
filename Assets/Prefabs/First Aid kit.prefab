@@ -147,3 +147,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healAmount: 20
+  pickupClip: {fileID: 8300000, guid: afc529fe2858740a1a8107127c9268ac, type: 3}
+  pickupVolume: 0.9

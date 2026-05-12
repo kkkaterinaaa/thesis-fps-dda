@@ -31,12 +31,24 @@ public abstract class EnemyBase : MonoBehaviour
 
     public EnemyStats stats;
 
+    [Header("Audio")]
+    public AudioClip shootClip;
+    [Range(0f, 1f)] public float shootVolume = 0.8f;
+    protected AudioSource audioSource;
+
     public virtual void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         var playerGo = GameObject.FindWithTag("Player");
         if (playerGo != null)
             player = playerGo.transform;
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f;
+        audioSource.minDistance = 2f;
+        audioSource.maxDistance = 30f;
     }
 
     public virtual void Update()
@@ -60,7 +72,6 @@ public abstract class EnemyBase : MonoBehaviour
     public void TryShoot()
 {
     if (fireCooldown > 0) return;
-
     if (player == null) return;
 
     float dist = Vector3.Distance(transform.position, player.position);
@@ -86,6 +97,9 @@ public abstract class EnemyBase : MonoBehaviour
         var flash = Instantiate(muzzleFlashPrefab, spawn.position, aimRot);
         Destroy(flash, 0.2f);
     }
+
+    if (shootClip != null && audioSource != null)
+        audioSource.PlayOneShot(shootClip, shootVolume);
 
     RaycastHit[] hits = Physics.RaycastAll(spawn.position, shotDir, attackRange, shootMask, QueryTriggerInteraction.Collide);
     if (hits != null && hits.Length > 0)

@@ -36,6 +36,21 @@ public class RaycastGun : MonoBehaviour
     
     public Crosshair crosshair;
 
+    [Header("Audio")]
+    public AudioClip shootClip;
+    public AudioClip reloadClip;
+    [Range(0f, 1f)] public float shootVolume = 0.9f;
+    [Range(0f, 1f)] public float reloadVolume = 0.8f;
+    private AudioSource audioSource;
+
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 0f;
+    }
+
     void Update()
     {
         if (!isReloading && ammoInMagazine <= 0 && reserveAmmo > 0)
@@ -67,6 +82,8 @@ public class RaycastGun : MonoBehaviour
         if (ammoInMagazine >= magazineSize) return;
 
         TelemetryManager.RecordReload(manual);
+        if (reloadClip != null && audioSource != null)
+            audioSource.PlayOneShot(reloadClip, reloadVolume);
         StartCoroutine(ReloadRoutine());
     }
 
@@ -96,6 +113,9 @@ public class RaycastGun : MonoBehaviour
 
     void Shoot()
     {
+        if (shootClip != null && audioSource != null)
+            audioSource.PlayOneShot(shootClip, shootVolume);
+
         crosshair.AddSpread(6f);
 
         RaycastHit hit;

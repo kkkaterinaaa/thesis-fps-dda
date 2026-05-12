@@ -147,3 +147,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cartridges: 10
+  pickupClip: {fileID: 8300000, guid: 03b49e344c7a44b9389e9fe9c073d8f9, type: 3}
+  pickupVolume: 0.9

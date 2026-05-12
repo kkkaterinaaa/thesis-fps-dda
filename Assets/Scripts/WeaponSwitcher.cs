@@ -15,6 +15,10 @@ public class WeaponSwitcher : MonoBehaviour
     private bool hasPistol = false;
     public bool HasPistol => hasPistol;
 
+    private bool hasScrolls = false;
+    public bool HasScrolls => hasScrolls;
+    public void MarkScrollsCollected() { hasScrolls = true; }
+
     void Awake()
     {
         if (!hasPistol && startSlot == 1)

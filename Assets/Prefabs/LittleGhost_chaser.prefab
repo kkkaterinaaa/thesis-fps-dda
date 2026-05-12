@@ -461,7 +461,7 @@ Transform:
   m_GameObject: {fileID: 4880965500387910529}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.051, y: 0.402, z: 0.461}
+  m_LocalPosition: {x: 0.049, y: 0.481, z: 0.183}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -700,6 +700,7 @@ GameObject:
   - component: {fileID: 8601675281937517667}
   - component: {fileID: 6048016935196073849}
   - component: {fileID: 6118705064919861500}
+  - component: {fileID: 1187132567038137078}
   m_Layer: 3
   m_Name: LittleGhost_chaser
   m_TagString: Enemy
@@ -715,7 +716,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7666352767211292150}
   serializedVersion: 2
-  m_LocalRotation: {x: -1.1165394e-17, y: -0.92599833, z: 4.5104653e-18, w: 0.37752774}
+  m_LocalRotation: {x: 0, y: -0.92599916, z: 0, w: 0.37752566}
   m_LocalPosition: {x: -26.092106, y: 0.08333337, z: 12.081566}
   m_LocalScale: {x: 4, y: 4, z: 4}
   m_ConstrainProportionsScale: 0
@@ -725,7 +726,7 @@ Transform:
   - {fileID: 8138648799385415064}
   - {fileID: 4086511206574641104}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -135.639, z: 0}
 --- !u!95 &997094217664290385
 Animator:
   serializedVersion: 5
@@ -848,6 +849,10 @@ MonoBehaviour:
   canRegenerate: 0
   regenRate: 5
   regenCap: 0.5
+  hitClip: {fileID: 8300000, guid: 93925a819d71547858d601f28466a064, type: 3}
+  deathClip: {fileID: 8300000, guid: a2bca71e3d03449909aaab3d1005eb6f, type: 3}
+  hitVolume: 0.8
+  deathVolume: 0.9
 --- !u!114 &3072470894258167305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -874,20 +879,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackRange: 10
   fireRate: 1
-  projectilePrefab: {fileID: 5192743889515011162, guid: aa789d69baf8e47e893213c519db1f3a, type: 3}
+  projectilePrefab: {fileID: 0}
   muzzle: {fileID: 4086511206574641104}
   projectileSpeed: 25
   projectileLifetime: 4
-  muzzleFlashPrefab: {fileID: 3093370748363751238, guid: 76cdbc7b4e493b540a4c8f4d598e0a5b, type: 3}
+  muzzleFlashPrefab: {fileID: 0}
   spreadAngle: 2
   shootMask:
     serializedVersion: 2
     m_Bits: 4294967295
   aimHeight: 1.1
-  tracerPrefab: {fileID: 5192743889515011162, guid: aa789d69baf8e47e893213c519db1f3a, type: 3}
-  tracerSpeed: 80
-  tracerLifetime: 1
+  tracerPrefab: {fileID: 1105658163262596798, guid: fc36b59cb4f3a44b79e70226c59a1efc, type: 3}
+  tracerSpeed: 25
+  tracerLifetime: 2
   stats: {fileID: 11400000, guid: 573a9a9572d5c4fc4bc2d3ec0fa21ff4, type: 2}
+  shootClip: {fileID: 8300000, guid: 2fc607cd4f6354584a0e4ccdd97b948c, type: 3}
+  shootVolume: 0.8
   desiredDistance: 3
 --- !u!114 &6048016935196073849
 MonoBehaviour:
@@ -923,6 +930,21 @@ MonoBehaviour:
   lineOfSightMask:
     serializedVersion: 2
     m_Bits: 59
+--- !u!114 &1187132567038137078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7666352767211292150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e180786574b643afacf293848a263f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashColor: {r: 1, g: 0.85, b: 1, a: 1}
+  duration: 0.08
+  renderers: []
 --- !u!1 &8874408174760244129
 GameObject:
   m_ObjectHideFlags: 0
