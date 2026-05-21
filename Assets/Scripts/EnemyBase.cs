@@ -77,9 +77,9 @@ public abstract class EnemyBase : MonoBehaviour
     float dist = Vector3.Distance(transform.position, player.position);
     if (dist > attackRange) return;
 
-    float aggression = DifficultyState.SpawnIntensity;
-    aggression = Mathf.Clamp(aggression, 0.25f, 4f);
-    fireCooldown = fireRate / aggression;
+    float fireMult = DifficultyState.EnemyFireRateMult;
+    fireMult = Mathf.Clamp(fireMult, 0.25f, 4f);
+    fireCooldown = fireRate / fireMult;
 
     Transform spawn = (muzzle != null) ? muzzle : transform;
     Vector3 aimPoint = player.position + Vector3.up * aimHeight;

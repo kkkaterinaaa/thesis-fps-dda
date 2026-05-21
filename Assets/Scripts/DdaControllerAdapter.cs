@@ -11,7 +11,7 @@ public class DdaControllerAdapter : MonoBehaviour, IDdaModule
     private static readonly string[] Keys = {
         "enemyDamageMult",
         "enemyHPMult",
-        "spawnIntensity",
+        "enemyFireRateMult",
         "healDropMult",
         "ammoDropMult",
     };
@@ -24,6 +24,14 @@ public class DdaControllerAdapter : MonoBehaviour, IDdaModule
     public IReadOnlyDictionary<string, float> BeginRun()
     {
         var dict = new Dictionary<string, float>();
+
+        if (ExperimentFlow.Instance != null && ExperimentFlow.Instance.IsBaselineRun)
+        {
+            for (int i = 0; i < Keys.Length; i++)
+                dict[Keys[i]] = 1f;
+            return dict;
+        }
+
         var action = controller != null ? controller.BeginRun() : null;
         if (action == null) return dict;
 
@@ -34,6 +42,9 @@ public class DdaControllerAdapter : MonoBehaviour, IDdaModule
 
     public void EndRun(string telemetryJson)
     {
+        if (ExperimentFlow.Instance != null && ExperimentFlow.Instance.IsBaselineRun)
+            return;
+
         if (controller != null) controller.EndRun(telemetryJson);
     }
 }

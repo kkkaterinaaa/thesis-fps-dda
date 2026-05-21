@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healAmount: 20
-  pickupClip: {fileID: 8300000, guid: afc529fe2858740a1a8107127c9268ac, type: 3}
+  pickupClip: {fileID: 8300000, guid: a56c3f47f45da4583b52c5a633a55999, type: 3}
   pickupVolume: 0.9
 --- !u!136 &6926433426105064249
 CapsuleCollider:

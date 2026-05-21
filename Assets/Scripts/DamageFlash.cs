@@ -40,6 +40,13 @@ public class DamageFlash : MonoBehaviour
         }
     }
 
+    public void Clear()
+    {
+        currentAlpha = 0f;
+        var c = flashColor; c.a = 0f;
+        if (image != null) image.color = c;
+    }
+
     public void Flash(float damage)
     {
         float t = damageForFullAlpha > 0f ? Mathf.Clamp01(damage / damageForFullAlpha) : 1f;

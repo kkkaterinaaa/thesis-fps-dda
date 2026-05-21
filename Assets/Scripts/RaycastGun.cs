@@ -53,6 +53,8 @@ public class RaycastGun : MonoBehaviour
 
     void Update()
     {
+        if (TutorialManager.InputBlocked) return;
+
         if (!isReloading && ammoInMagazine <= 0 && reserveAmmo > 0)
         {
             StartReload(false);
@@ -82,6 +84,8 @@ public class RaycastGun : MonoBehaviour
         if (ammoInMagazine >= magazineSize) return;
 
         TelemetryManager.RecordReload(manual);
+        if (manual)
+            TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.ManualReload);
         if (reloadClip != null && audioSource != null)
             audioSource.PlayOneShot(reloadClip, reloadVolume);
         StartCoroutine(ReloadRoutine());

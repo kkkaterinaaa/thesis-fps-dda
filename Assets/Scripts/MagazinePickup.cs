@@ -20,8 +20,10 @@ public class MagazinePickup : MonoBehaviour
 
         if (gun == null) return;
 
-        gun.AddReserveAmmo(cartridges);
-        TelemetryManager.RecordMagazinePickup(cartridges);
+        float mult = Mathf.Clamp(DifficultyState.AmmoDropMult, 0.1f, 10f);
+        int effectiveCartridges = Mathf.Max(1, Mathf.RoundToInt(cartridges * mult));
+        gun.AddReserveAmmo(effectiveCartridges);
+        TelemetryManager.RecordMagazinePickup(effectiveCartridges);
         TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.CollectMagazine);
         if (pickupClip != null)
             AudioSource.PlayClipAtPoint(pickupClip, transform.position, pickupVolume);

@@ -14,7 +14,8 @@ public class ArmorPickup : MonoBehaviour
         var playerHealth = other.GetComponentInParent<PlayerHealth>();
         if (playerHealth == null) return;
 
-        float amountToAdd = fillToMax ? playerHealth.maxArmor : armorAmount;
+        float mult = Mathf.Clamp(DifficultyState.HealDropMult, 0.1f, 10f);
+        float amountToAdd = fillToMax ? playerHealth.maxArmor : armorAmount * mult;
         playerHealth.AddArmor(amountToAdd);
         TelemetryManager.RecordArmorPickup(amountToAdd);
         TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.CollectArmor);

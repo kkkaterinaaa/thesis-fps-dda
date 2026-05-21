@@ -11,6 +11,7 @@ public class Health : MonoBehaviour
     public float regenCap = 0.5f;       // На сколько процентов от maxHealth восстанавливается (например, до 50%)
 
     public System.Action OnDeath;       // Событие смерти
+    public System.Action<float> OnDamaged; // amount
 
     [Header("Audio")]
     public AudioClip hitClip;
@@ -49,6 +50,7 @@ public class Health : MonoBehaviour
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
+        OnDamaged?.Invoke(amount);
 
         if (GetComponent<EnemyBase>() != null || GetComponent<EnemyController>() != null || GetComponent<EnemyDeath>() != null)
         {
@@ -92,9 +94,12 @@ public class Health : MonoBehaviour
     }
 
     // Устанавливает максимальное здоровье
-    public void SetMax(float newMax)
+    public void SetMax(float newMax, bool fillToMax = false)
     {
         maxHealth = newMax;
-        currentHealth = Mathf.Min(currentHealth, maxHealth); // Ограничиваем здоровье новым max
+        if (fillToMax)
+            currentHealth = maxHealth;
+        else
+            currentHealth = Mathf.Min(currentHealth, maxHealth);
     }
 }

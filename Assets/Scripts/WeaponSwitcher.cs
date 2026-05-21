@@ -31,6 +31,8 @@ public class WeaponSwitcher : MonoBehaviour
 
     void Update()
     {
+        if (TutorialManager.InputBlocked) return;
+
         if (Input.GetKeyDown(KeyCode.Alpha1) && hasPistol) Equip(1);
         if (Input.GetKeyDown(KeyCode.Alpha2)) Equip(2);
 

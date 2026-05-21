@@ -618,8 +618,8 @@ MonoBehaviour:
   canRegenerate: 0
   regenRate: 5
   regenCap: 0.5
-  hitClip: {fileID: 8300000, guid: c9b06bef694ad415dbeead33ed111d32, type: 3}
-  deathClip: {fileID: 8300000, guid: a5e1ea94538c04da5a63a5801a9d624d, type: 3}
+  hitClip: {fileID: 8300000, guid: 93925a819d71547858d601f28466a064, type: 3}
+  deathClip: {fileID: 8300000, guid: a2bca71e3d03449909aaab3d1005eb6f, type: 3}
   hitVolume: 0.8
   deathVolume: 0.9
 --- !u!114 &6146327633519254887

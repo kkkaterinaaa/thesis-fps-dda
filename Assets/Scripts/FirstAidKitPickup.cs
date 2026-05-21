@@ -16,8 +16,11 @@ public class FirstAidKitPickup : MonoBehaviour
         if (playerHealth.CurrentHealth >= playerHealth.maxHealth)
             return;
 
+        float mult = Mathf.Clamp(DifficultyState.HealDropMult, 0.1f, 10f);
+        float effectiveAmount = healAmount * mult;
+
         float before = playerHealth.CurrentHealth;
-        playerHealth.Heal(healAmount);
+        playerHealth.Heal(effectiveAmount);
         float healed = Mathf.Max(0f, playerHealth.CurrentHealth - before);
         TelemetryManager.RecordMedkitPickup(healed);
         TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.CollectMedkit);

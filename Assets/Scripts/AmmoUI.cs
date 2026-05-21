@@ -57,7 +57,7 @@ public class AmmoUI : MonoBehaviour
         if (isPistol && gun != null && ammoText != null)
         {
             int total = gun.GetAmmoInMagazine() + gun.GetReserveAmmo();
-            string suffix = gun.IsReloading() ? "  reloading..." : "";
+            string suffix = gun.IsReloading() ? "  reading..." : "";
             ammoText.text = $"{total}{suffix}";
         }
 
