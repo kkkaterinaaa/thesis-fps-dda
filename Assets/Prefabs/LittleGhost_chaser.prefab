@@ -893,9 +893,10 @@ MonoBehaviour:
   tracerSpeed: 25
   tracerLifetime: 2
   stats: {fileID: 11400000, guid: 573a9a9572d5c4fc4bc2d3ec0fa21ff4, type: 2}
+  hitStunDuration: 0.2
   shootClip: {fileID: 8300000, guid: 2fc607cd4f6354584a0e4ccdd97b948c, type: 3}
   shootVolume: 0.8
-  desiredDistance: 3
+  desiredDistance: 4
 --- !u!114 &6048016935196073849
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -925,11 +926,12 @@ MonoBehaviour:
   patrolPointReachDistance: 0.6
   roamRadius: 6
   roamRepathDistance: 1.2
-  detectionRange: 10
+  detectionRange: 20
   fieldOfView: 120
   lineOfSightMask:
     serializedVersion: 2
     m_Bits: 59
+  alertDuration: 8
 --- !u!114 &1187132567038137078
 MonoBehaviour:
   m_ObjectHideFlags: 0

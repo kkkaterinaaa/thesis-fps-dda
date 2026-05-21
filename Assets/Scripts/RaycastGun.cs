@@ -28,6 +28,7 @@ public class RaycastGun : MonoBehaviour
     public float projectileSpeed = 45f;
     public float projectileLifetime = 3f;
 
+    public WeaponSwitcher weaponSwitcher;
     public Camera fpsCam;
     float nextFireTime = 0f;
 
@@ -54,6 +55,13 @@ public class RaycastGun : MonoBehaviour
     void Update()
     {
         if (TutorialManager.InputBlocked) return;
+        if (PlayerHealth.IsStunned) return;
+
+        if (!isReloading && ammoInMagazine <= 0 && reserveAmmo <= 0)
+        {
+            if (weaponSwitcher != null && weaponSwitcher.ActiveSlot == 1)
+                weaponSwitcher.Equip(2);
+        }
 
         if (!isReloading && ammoInMagazine <= 0 && reserveAmmo > 0)
         {

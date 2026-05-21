@@ -31,6 +31,10 @@ public abstract class EnemyBase : MonoBehaviour
 
     public EnemyStats stats;
 
+    [Header("Hit Stun")]
+    public float hitStunDuration = 0.2f;
+    private float hitStunTimer;
+
     [Header("Audio")]
     public AudioClip shootClip;
     [Range(0f, 1f)] public float shootVolume = 0.8f;
@@ -49,11 +53,15 @@ public abstract class EnemyBase : MonoBehaviour
         audioSource.spatialBlend = 1f;
         audioSource.minDistance = 2f;
         audioSource.maxDistance = 30f;
+
+        var hp = GetComponent<Health>();
+        if (hp != null) hp.OnDamaged += _ => hitStunTimer = hitStunDuration;
     }
 
     public virtual void Update()
     {
         fireCooldown -= Time.deltaTime;
+        hitStunTimer -= Time.deltaTime;
 
         var patrol = GetComponent<EnemyPatrolPerception>();
         if (patrol != null && !patrol.CanEngage)
@@ -72,6 +80,7 @@ public abstract class EnemyBase : MonoBehaviour
     public void TryShoot()
 {
     if (fireCooldown > 0) return;
+    if (hitStunTimer > 0) return;
     if (player == null) return;
 
     float dist = Vector3.Distance(transform.position, player.position);

@@ -60,7 +60,17 @@ public class TutorialManager : MonoBehaviour
         new Objective { type = ObjectiveType.PressEToFinish,  message = "Press E to finish the tutorial" },
     };
 
+    [System.Serializable]
+    public class ObjectiveGates
+    {
+        public WallRaiser[] walls;
+    }
+
+    [Header("Gates (one entry per objective; last 3 are ignored)")]
+    public ObjectiveGates[] gates;
+
     [Header("UI")]
+    public GameObject objectivePanel;
     public TMP_Text objectiveText;
     public GameObject startPanel;
     public Button startButton;
@@ -125,7 +135,7 @@ public class TutorialManager : MonoBehaviour
     {
         currentIndex = 0;
         if (started) ShowCurrentObjective();
-        else if (objectiveText != null) objectiveText.gameObject.SetActive(false);
+        else SetObjectivePanelVisible(false);
     }
 
     public void BeginTutorial()
@@ -144,6 +154,12 @@ public class TutorialManager : MonoBehaviour
     {
         if (!started) return;
         if (InputBlocked) return;
+
+        if (Input.GetKeyDown(KeyCode.F8))
+        {
+            GoToLevel();
+            return;
+        }
 
         if (Input.GetKeyDown(controlsKey))
         {
@@ -192,17 +208,21 @@ public class TutorialManager : MonoBehaviour
 
     private void ShowCurrentObjective()
     {
-        if (objectiveText == null) return;
-
         if (currentIndex < objectives.Length)
         {
-            objectiveText.gameObject.SetActive(true);
-            objectiveText.text = objectives[currentIndex].message;
+            SetObjectivePanelVisible(true);
+            if (objectiveText != null) objectiveText.text = objectives[currentIndex].message;
         }
         else
         {
-            objectiveText.gameObject.SetActive(false);
+            SetObjectivePanelVisible(false);
         }
+    }
+
+    private void SetObjectivePanelVisible(bool visible)
+    {
+        if (objectivePanel != null) objectivePanel.SetActive(visible);
+        if (objectiveText != null) objectiveText.gameObject.SetActive(visible);
     }
 
     public static void CompleteObjective(ObjectiveType type)
@@ -217,7 +237,10 @@ public class TutorialManager : MonoBehaviour
         if (objectives[currentIndex].type != type) return;
 
         objectives[currentIndex].completed = true;
+        int completedIndex = currentIndex;
         currentIndex++;
+
+        RaiseGatesForObjective(completedIndex);
 
         if (currentIndex >= objectives.Length)
         {
@@ -229,10 +252,24 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
+    private void RaiseGatesForObjective(int objectiveIndex)
+    {
+        int lastThreeStart = objectives.Length - 3;
+        if (objectiveIndex >= lastThreeStart) return;
+        if (gates == null || objectiveIndex >= gates.Length) return;
+
+        var gate = gates[objectiveIndex];
+        if (gate == null || gate.walls == null) return;
+
+        foreach (var wall in gate.walls)
+        {
+            if (wall != null) wall.Rise();
+        }
+    }
+
     private void ShowTutorialCompleted()
     {
-        if (objectiveText != null)
-            objectiveText.gameObject.SetActive(false);
+        SetObjectivePanelVisible(false);
 
         if (controlsPanel != null)
             controlsPanel.SetActive(false);

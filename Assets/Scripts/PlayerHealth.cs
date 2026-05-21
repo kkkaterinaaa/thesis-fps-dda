@@ -15,6 +15,13 @@ public class PlayerHealth : MonoBehaviour
     public float armorDamageReduction = 0.75f;
     public bool logDamage = false;
 
+    [Header("Hit Stun")]
+    public float hitStunDuration = 0.15f;
+    private static float stunUntil;
+    public static bool IsStunned => Time.time < stunUntil;
+
+    private PlayerAudio playerAudio;
+
     public float CurrentHealth => currentHealth;
     public float CurrentArmor => currentArmor;
 
@@ -22,6 +29,8 @@ public class PlayerHealth : MonoBehaviour
     {
         currentHealth = maxHealth;
         currentArmor = 0f;
+        playerAudio = GetComponentInChildren<PlayerAudio>();
+        if (playerAudio == null) playerAudio = GetComponent<PlayerAudio>();
     }
 
     public void TakeDamage(float amount)
@@ -41,6 +50,9 @@ public class PlayerHealth : MonoBehaviour
         }
 
         currentHealth -= damageToHealth;
+
+        stunUntil = Time.time + hitStunDuration;
+        if (playerAudio != null) playerAudio.PlayHit();
 
         if (DamageFlash.Instance != null)
             DamageFlash.Instance.Flash(amount);
