@@ -110,25 +110,20 @@ public abstract class EnemyBase : MonoBehaviour
     if (shootClip != null && audioSource != null)
         audioSource.PlayOneShot(shootClip, shootVolume);
 
-    RaycastHit[] hits = Physics.RaycastAll(spawn.position, shotDir, attackRange, shootMask, QueryTriggerInteraction.Collide);
-    if (hits != null && hits.Length > 0)
+    RaycastHit hit;
+    if (Physics.Raycast(spawn.position, shotDir, out hit, attackRange, shootMask, QueryTriggerInteraction.Collide))
     {
-        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        SpawnTracer(spawn.position, hit.point);
 
-        SpawnTracer(spawn.position, hits[0].point);
-
-        for (int i = 0; i < hits.Length; i++)
+        var playerHealth = hit.collider.GetComponentInParent<PlayerHealth>();
+        if (playerHealth != null)
         {
-            var playerHealth = hits[i].collider.GetComponentInParent<PlayerHealth>();
-            if (playerHealth == null) continue;
-
-            bool isHead = hits[i].collider.CompareTag("Head");
+            bool isHead = hit.collider.CompareTag("Head");
             float dmgMult = DifficultyState.EnemyDamageMult;
             dmgMult = Mathf.Clamp(dmgMult, 0.1f, 10f);
             float damage = (isHead ? stats.headDamage : stats.bodyDamage) * dmgMult;
             Debug.Log(isHead ? "Enemy HEADSHOT" : "Enemy body hit");
             playerHealth.TakeDamage(damage);
-            break;
         }
     }
     else

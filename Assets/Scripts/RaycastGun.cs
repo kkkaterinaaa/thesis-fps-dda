@@ -139,6 +139,8 @@ public class RaycastGun : MonoBehaviour
             dir = spread * dir;
         }
 
+        TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.KillWithPistol);
+
         if (Physics.Raycast(fpsCam.transform.position, dir, out hit, range, hitMask, QueryTriggerInteraction.Collide))
         {
             SpawnTracer(fpsCam.transform.position, hit.point);
@@ -150,9 +152,6 @@ public class RaycastGun : MonoBehaviour
 
                 bool isHead = hit.collider != null && hit.collider.CompareTag("Head");
                 TelemetryManager.RecordShotHit(isHead, damage);
-
-                if (h.currentHealth <= 0)
-                    TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.KillWithPistol);
             }
 
             if (hitEffectPrefab != null)

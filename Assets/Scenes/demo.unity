@@ -1945,7 +1945,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1066157829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4564,7 +4564,7 @@ MonoBehaviour:
     message: Find and collect the magic wand
     completed: 0
   - type: 5
-    message: Banish a ghost by casting a spell with your wand
+    message: Cast a spell using the magic wand
     completed: 0
   - type: 6
     message: Find and collect a spell scroll
@@ -5131,8 +5131,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3.4160767, y: 463.4521}
-  m_SizeDelta: {x: -1282.0713, y: -1051.484}
+  m_AnchoredPosition: {x: 1.3406982, y: 414.12473}
+  m_SizeDelta: {x: -1291.6, y: -952.829}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2087228485
 MonoBehaviour:
@@ -5437,6 +5437,10 @@ PrefabInstance:
       propertyPath: m_CastShadows
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3476191337646617681, guid: 37d59c606927c4a188269ca0a7bcf791, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.672
+      objectReference: {fileID: 0}
     - target: {fileID: 3868434700421958262, guid: 37d59c606927c4a188269ca0a7bcf791, type: 3}
       propertyPath: speed
       value: 7
@@ -5494,19 +5498,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 342447127186431392, guid: f6871294bca9646659a45f17314ee16a, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 618.7863
+      value: 612.185
       objectReference: {fileID: 0}
     - target: {fileID: 342447127186431392, guid: f6871294bca9646659a45f17314ee16a, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 11.2884
+      value: 93.149
       objectReference: {fileID: 0}
     - target: {fileID: 342447127186431392, guid: f6871294bca9646659a45f17314ee16a, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -3.4738
+      value: 1.3407
       objectReference: {fileID: 0}
     - target: {fileID: 342447127186431392, guid: f6871294bca9646659a45f17314ee16a, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 464.4598
+      value: 414.12
       objectReference: {fileID: 0}
     - target: {fileID: 1813723192125375404, guid: f6871294bca9646659a45f17314ee16a, type: 3}
       propertyPath: gun
@@ -5526,7 +5530,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: d32e9967a3fda49969849019700ef6d5, type: 3}
     - target: {fileID: 2125401415694274719, guid: f6871294bca9646659a45f17314ee16a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2409034581353020991, guid: f6871294bca9646659a45f17314ee16a, type: 3}
       propertyPath: m_Name
@@ -5687,6 +5691,14 @@ PrefabInstance:
     - target: {fileID: 7225200558368911701, guid: f6871294bca9646659a45f17314ee16a, type: 3}
       propertyPath: m_fontSize
       value: 42
+      objectReference: {fileID: 0}
+    - target: {fileID: 7225200558368911701, guid: f6871294bca9646659a45f17314ee16a, type: 3}
+      propertyPath: m_margin.x
+      value: 5.192291
+      objectReference: {fileID: 0}
+    - target: {fileID: 7225200558368911701, guid: f6871294bca9646659a45f17314ee16a, type: 3}
+      propertyPath: m_margin.z
+      value: 0.00012207031
       objectReference: {fileID: 0}
     - target: {fileID: 7225200558368911701, guid: f6871294bca9646659a45f17314ee16a, type: 3}
       propertyPath: m_fontColor.b
