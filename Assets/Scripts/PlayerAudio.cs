@@ -15,6 +15,10 @@ public class PlayerAudio : MonoBehaviour
     public AudioClip jumpClip;
     [Range(0f, 1f)] public float jumpVolume = 0.9f;
 
+    [Header("Hit")]
+    public AudioClip hitClip;
+    [Range(0f, 1f)] public float hitVolume = 0.8f;
+
     private AudioSource source;
     private float nextStepTime;
     private int lastIndex = -1;
@@ -57,6 +61,12 @@ public class PlayerAudio : MonoBehaviour
     {
         if (jumpClip == null || source == null) return;
         source.PlayOneShot(jumpClip, jumpVolume);
+    }
+
+    public void PlayHit()
+    {
+        if (hitClip == null || source == null) return;
+        source.PlayOneShot(hitClip, hitVolume);
     }
 
     private int PickIndex(int n)

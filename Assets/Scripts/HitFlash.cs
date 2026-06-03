@@ -5,17 +5,19 @@ public class HitFlash : MonoBehaviour
 {
     [Header("Flash")]
     public Color flashColor = new Color(1f, 0.85f, 1f, 1f);
-    public float duration = 0.08f;
+    public float duration = 0.15f;
     [Tooltip("If empty, will auto-collect all child Renderers on Awake")]
     public Renderer[] renderers;
 
     private struct Entry
     {
         public Material material;
+        public string colorProp;
         public Color originalColor;
         public bool hasColor;
         public Color originalEmission;
         public bool hasEmission;
+        public bool emissionWasEnabled;
     }
 
     private readonly List<Entry> entries = new List<Entry>();
@@ -40,12 +42,14 @@ public class HitFlash : MonoBehaviour
                 if (m.HasProperty("_Color"))
                 {
                     e.hasColor = true;
-                    e.originalColor = m.color;
+                    e.colorProp = "_Color";
+                    e.originalColor = m.GetColor("_Color");
                 }
                 if (m.HasProperty("_EmissionColor"))
                 {
                     e.hasEmission = true;
                     e.originalEmission = m.GetColor("_EmissionColor");
+                    e.emissionWasEnabled = m.IsKeywordEnabled("_EMISSION");
                 }
                 entries.Add(e);
             }
@@ -65,7 +69,7 @@ public class HitFlash : MonoBehaviour
         {
             var e = entries[i];
             if (e.material == null) continue;
-            if (e.hasColor) e.material.color = flashColor;
+            if (e.hasColor) e.material.SetColor(e.colorProp, flashColor);
             if (e.hasEmission)
             {
                 e.material.EnableKeyword("_EMISSION");
@@ -82,8 +86,13 @@ public class HitFlash : MonoBehaviour
         {
             var e = entries[i];
             if (e.material == null) continue;
-            if (e.hasColor) e.material.color = e.originalColor;
-            if (e.hasEmission) e.material.SetColor("_EmissionColor", e.originalEmission);
+            if (e.hasColor) e.material.SetColor(e.colorProp, e.originalColor);
+            if (e.hasEmission)
+            {
+                e.material.SetColor("_EmissionColor", e.originalEmission);
+                if (!e.emissionWasEnabled)
+                    e.material.DisableKeyword("_EMISSION");
+            }
         }
         flashing = false;
     }

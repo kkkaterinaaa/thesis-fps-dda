@@ -13,7 +13,7 @@ public static class DifficultyState
 
     public static float EnemyDamageMult => Get("enemyDamageMult");
     public static float EnemyHPMult     => Get("enemyHPMult");
-    public static float SpawnIntensity  => Get("spawnIntensity");
+    public static float EnemyFireRateMult => Get("enemyFireRateMult");
     public static float HealDropMult    => Get("healDropMult");
     public static float AmmoDropMult    => Get("ammoDropMult");
 }

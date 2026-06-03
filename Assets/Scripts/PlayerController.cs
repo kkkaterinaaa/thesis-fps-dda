@@ -12,6 +12,10 @@ public class PlayerController : MonoBehaviour
     [Header("Jump feel")]
     public float coyoteTime = 0.12f;
     public float jumpBufferTime = 0.12f;
+    [Tooltip("Extra gravity multiplier while falling (>1 makes fall faster than rise)")]
+    public float fallGravityMultiplier = 2f;
+    [Tooltip("If the head hits the ceiling, vertical velocity is zeroed instantly")]
+    public bool cancelJumpOnCeiling = true;
     private float coyoteTimer;
     private float jumpBufferTimer;
 
@@ -33,7 +37,8 @@ public class PlayerController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         cam = GetComponentInChildren<Camera>();
-        Cursor.lockState = CursorLockMode.Locked;
+        if (!TutorialManager.InputBlocked)
+            Cursor.lockState = CursorLockMode.Locked;
 
         originalHeight = controller.height;
 
@@ -42,6 +47,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (TutorialManager.InputBlocked) return;
+
         HandleMouseLook();
         HandleMovement();
         HandleActions();
@@ -49,7 +56,12 @@ public class PlayerController : MonoBehaviour
 
     void HandleMouseLook()
     {
-        if (Cursor.lockState != CursorLockMode.Locked) return;
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            return;
+        }
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
@@ -73,8 +85,6 @@ public class PlayerController : MonoBehaviour
         if (sprinting) currentSpeed = sprintSpeed;
         if (isCrouching) currentSpeed = crouchSpeed;
 
-        controller.Move(move * currentSpeed * Time.deltaTime);
-
         bool grounded = controller.isGrounded;
 
         if (grounded) coyoteTimer = coyoteTime;
@@ -83,10 +93,10 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown("Jump")) jumpBufferTimer = jumpBufferTime;
         else                             jumpBufferTimer -= Time.deltaTime;
 
-        bool jumped = false;
         if (grounded && velocity.y < 0f)
             velocity.y = -2f;
 
+        bool jumped = false;
         if (jumpBufferTimer > 0f && coyoteTimer > 0f)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
@@ -95,10 +105,14 @@ public class PlayerController : MonoBehaviour
             coyoteTimer = 0f;
         }
 
-        if (!grounded)
-            velocity.y += gravity * Time.deltaTime;
+        float gravityNow = (velocity.y < 0f) ? gravity * fallGravityMultiplier : gravity;
+        velocity.y += gravityNow * Time.deltaTime;
 
-        controller.Move(velocity * Time.deltaTime);
+        Vector3 frameMove = move * currentSpeed + Vector3.up * velocity.y;
+        controller.Move(frameMove * Time.deltaTime);
+
+        if (cancelJumpOnCeiling && (controller.collisionFlags & CollisionFlags.Above) != 0 && velocity.y > 0f)
+            velocity.y = 0f;
 
         if (playerAudio != null)
         {
@@ -131,15 +145,6 @@ public class PlayerController : MonoBehaviour
                 isCrouching = false;
                 controller.height = standHeight;
             }
-        }
-
-        if (Input.GetMouseButton(1))
-        {
-            cam.fieldOfView = 60f;
-        }
-        else
-        {
-            cam.fieldOfView = 90f;
         }
 
     }

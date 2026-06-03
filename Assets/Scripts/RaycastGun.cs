@@ -28,6 +28,7 @@ public class RaycastGun : MonoBehaviour
     public float projectileSpeed = 45f;
     public float projectileLifetime = 3f;
 
+    public WeaponSwitcher weaponSwitcher;
     public Camera fpsCam;
     float nextFireTime = 0f;
 
@@ -53,6 +54,15 @@ public class RaycastGun : MonoBehaviour
 
     void Update()
     {
+        if (TutorialManager.InputBlocked) return;
+        if (PlayerHealth.IsStunned) return;
+
+        if (!isReloading && ammoInMagazine <= 0 && reserveAmmo <= 0)
+        {
+            if (weaponSwitcher != null && weaponSwitcher.ActiveSlot == 1)
+                weaponSwitcher.Equip(2);
+        }
+
         if (!isReloading && ammoInMagazine <= 0 && reserveAmmo > 0)
         {
             StartReload(false);
@@ -82,6 +92,8 @@ public class RaycastGun : MonoBehaviour
         if (ammoInMagazine >= magazineSize) return;
 
         TelemetryManager.RecordReload(manual);
+        if (manual)
+            TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.ManualReload);
         if (reloadClip != null && audioSource != null)
             audioSource.PlayOneShot(reloadClip, reloadVolume);
         StartCoroutine(ReloadRoutine());
@@ -127,6 +139,8 @@ public class RaycastGun : MonoBehaviour
             dir = spread * dir;
         }
 
+        TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.KillWithPistol);
+
         if (Physics.Raycast(fpsCam.transform.position, dir, out hit, range, hitMask, QueryTriggerInteraction.Collide))
         {
             SpawnTracer(fpsCam.transform.position, hit.point);
@@ -138,9 +152,6 @@ public class RaycastGun : MonoBehaviour
 
                 bool isHead = hit.collider != null && hit.collider.CompareTag("Head");
                 TelemetryManager.RecordShotHit(isHead, damage);
-
-                if (h.currentHealth <= 0)
-                    TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.KillWithPistol);
             }
 
             if (hitEffectPrefab != null)

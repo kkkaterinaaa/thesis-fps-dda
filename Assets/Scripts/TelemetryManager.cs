@@ -48,6 +48,9 @@ public class TelemetryManager : MonoBehaviour
     public bool logSummaryToConsole = true;
     public string outputFolderOverride = "";
 
+    [Tooltip("If true, the session does NOT auto-start in Awake. Call BeginSessionManually() after the player ID is entered.")]
+    public bool manualStart = false;
+
     private SessionData data;
     private float startTime;
     private bool ended;
@@ -65,6 +68,13 @@ public class TelemetryManager : MonoBehaviour
 
         SceneManager.sceneLoaded += OnSceneLoaded;
 
+        if (!manualStart)
+            StartSession();
+    }
+
+    public void BeginSessionManually()
+    {
+        if (!ended && data != null) return; // already running
         StartSession();
     }
 
