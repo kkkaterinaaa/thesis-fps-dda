@@ -86,6 +86,14 @@ public class RaycastGun : MonoBehaviour
         }
     }
 
+    void OnDisable()
+    {
+        if (isReloading)
+        {
+            isReloading = false;
+        }
+    }
+
     private void StartReload(bool manual)
     {
         if (isReloading) return;
