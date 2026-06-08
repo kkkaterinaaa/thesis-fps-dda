@@ -49,6 +49,10 @@ public class PlayerController : MonoBehaviour
     {
         if (TutorialManager.InputBlocked) return;
 
+        // While the game is paused (pause/death/win screens), don't capture
+        // the mouse so the cursor stays free to click UI buttons.
+        if (Time.timeScale == 0f) return;
+
         HandleMouseLook();
         HandleMovement();
         HandleActions();

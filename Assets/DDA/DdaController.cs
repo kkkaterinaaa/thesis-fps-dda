@@ -19,16 +19,11 @@ public class DdaController : MonoBehaviour
     public BoxActionSpaceConfig actionSpace;
     public RewardFromJson reward;
 
-    public MonoBehaviour playerIdProvider;
-
-    public bool logDecisions;
-    public string decisionLogFileName = "dda_decisions.jsonl";
-
     public DdaAction CurrentAction { get; private set; }
 
     private System.Random rng;
     private LinUcbState state;
-    private string currentPlayerId;
+    private bool initialized;
 
     void Awake()
     {
@@ -37,7 +32,7 @@ public class DdaController : MonoBehaviour
 
     public DdaAction BeginRun()
     {
-        EnsureInitializedForPlayer();
+        EnsureInitialized();
         if (actionSpace == null || settings == null)
             return null;
 
@@ -48,21 +43,18 @@ public class DdaController : MonoBehaviour
 
     public void EndRun(string telemetryJson)
     {
-        EnsureInitializedForPlayer();
+        EnsureInitialized();
         if (reward == null || CurrentAction == null)
             return;
 
         float r = Mathf.Clamp01(reward.Evaluate(telemetryJson));
         UpdateModel(CurrentAction, r);
         SaveState();
-
-        if (logDecisions)
-            AppendDecisionLog(telemetryJson, r);
     }
 
     public void ResetCurrentPlayerModel()
     {
-        EnsureInitializedForPlayer();
+        EnsureInitialized();
 
         try
         {
@@ -78,13 +70,12 @@ public class DdaController : MonoBehaviour
         SaveState();
     }
 
-    private void EnsureInitializedForPlayer()
+    private void EnsureInitialized()
     {
-        string pid = GetPlayerId();
-        if (state != null && string.Equals(pid, currentPlayerId, StringComparison.Ordinal))
+        if (initialized && state != null)
             return;
 
-        currentPlayerId = pid;
+        initialized = true;
         LoadState();
 
         if (state == null)
@@ -92,30 +83,6 @@ public class DdaController : MonoBehaviour
             state = CreateDefaultState();
             SaveState();
         }
-    }
-
-    private string GetPlayerId()
-    {
-        if (playerIdProvider != null)
-        {
-            var provider = playerIdProvider as IPlayerIdProvider;
-            if (provider != null)
-            {
-                string id = provider.GetPlayerId();
-                if (!string.IsNullOrWhiteSpace(id))
-                    return id;
-            }
-        }
-
-        const string key = "dda.anonymousPlayerId";
-        string existing = PlayerPrefs.GetString(key, "");
-        if (!string.IsNullOrWhiteSpace(existing))
-            return existing;
-
-        string created = Guid.NewGuid().ToString("N");
-        PlayerPrefs.SetString(key, created);
-        PlayerPrefs.Save();
-        return created;
     }
 
     private void InitRng()
@@ -365,43 +332,7 @@ public class DdaController : MonoBehaviour
     private string GetStatePath()
     {
         string folder = Path.Combine(Application.persistentDataPath, "dda", modelKey);
-        string file = currentPlayerId + ".json";
-        return Path.Combine(folder, file);
-    }
-
-    private void AppendDecisionLog(string telemetryJson, float r)
-    {
-        try
-        {
-            string folder = Path.Combine(Application.persistentDataPath, "dda", modelKey);
-            Directory.CreateDirectory(folder);
-            string path = Path.Combine(folder, decisionLogFileName);
-
-            string actionJson = CurrentAction != null ? JsonUtility.ToJson(CurrentAction, false) : "{}";
-            string line = JsonUtility.ToJson(new LogLine
-            {
-                utc = DateTime.UtcNow.ToString("o"),
-                playerId = currentPlayerId,
-                reward = r,
-                action = actionJson,
-                telemetry = telemetryJson
-            }, false);
-
-            File.AppendAllText(path, line + "\n");
-        }
-        catch
-        {
-        }
-    }
-
-    [Serializable]
-    private class LogLine
-    {
-        public string utc;
-        public string playerId;
-        public float reward;
-        public string action;
-        public string telemetry;
+        return Path.Combine(folder, "model.json");
     }
 
     private static float Dot(float[] a, float[] b)

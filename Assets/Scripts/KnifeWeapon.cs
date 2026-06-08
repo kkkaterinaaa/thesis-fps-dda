@@ -29,6 +29,7 @@ public class KnifeWeapon : MonoBehaviour
     void Update()
     {
         if (TutorialManager.InputBlocked) return;
+        if (Time.timeScale == 0f) return;
 
         if (Input.GetMouseButtonDown(0) && Time.time >= nextAttackTime)
         {

@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,11 +8,12 @@ public class DeathScreen : MonoBehaviour
 
     public GameObject deathPanel;
 
-    [Header("Experiment Buttons")]
-    public Button surveyButton;
+    [Header("Buttons")]
     public Button restartButton;
-    public GameObject thanksRoot;
-    public TMP_Text thanksText;
+    public Button mainMenuButton;
+
+    [Tooltip("Name of the start-menu scene loaded by the Main Menu button. Must be in Build Settings.")]
+    public string mainMenuSceneName = "MainMenu";
 
     [Tooltip("Scripts to disable while the screen is shown")]
     public MonoBehaviour[] blockScripts;
@@ -24,6 +24,18 @@ public class DeathScreen : MonoBehaviour
 
         if (deathPanel != null)
             deathPanel.SetActive(false);
+
+        if (restartButton != null)
+        {
+            restartButton.onClick.RemoveAllListeners();
+            restartButton.onClick.AddListener(Restart);
+        }
+
+        if (mainMenuButton != null)
+        {
+            mainMenuButton.onClick.RemoveAllListeners();
+            mainMenuButton.onClick.AddListener(GoToMainMenu);
+        }
     }
 
     public void Show()
@@ -42,8 +54,17 @@ public class DeathScreen : MonoBehaviour
 
         if (DamageFlash.Instance != null)
             DamageFlash.Instance.Clear();
+    }
 
-        if (ExperimentFlow.Instance != null)
-            ExperimentFlow.Instance.SetupEndScreen(surveyButton, restartButton, thanksRoot, thanksText);
+    private void Restart()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void GoToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,7 +9,6 @@ public class TelemetryManager : MonoBehaviour
     [Serializable]
     public class SessionData
     {
-        public string sessionId;
         public string startedAtUtc;
         public string endedAtUtc;
         public string endReason;
@@ -44,12 +42,7 @@ public class TelemetryManager : MonoBehaviour
         public float skillScore;
     }
 
-    public bool writeJsonFile = true;
     public bool logSummaryToConsole = true;
-    public string outputFolderOverride = "";
-
-    [Tooltip("If true, the session does NOT auto-start in Awake. Call BeginSessionManually() after the player ID is entered.")]
-    public bool manualStart = false;
 
     private SessionData data;
     private float startTime;
@@ -68,13 +61,6 @@ public class TelemetryManager : MonoBehaviour
 
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-        if (!manualStart)
-            StartSession();
-    }
-
-    public void BeginSessionManually()
-    {
-        if (!ended && data != null) return; // already running
         StartSession();
     }
 
@@ -96,7 +82,6 @@ public class TelemetryManager : MonoBehaviour
         startTime = Time.realtimeSinceStartup;
 
         data = new SessionData();
-        data.sessionId = Guid.NewGuid().ToString("N");
         data.startedAtUtc = DateTime.UtcNow.ToString("o");
 
         RunSessionEvents.RaiseRunStarted();
@@ -122,11 +107,8 @@ public class TelemetryManager : MonoBehaviour
 
         RunSessionEvents.RaiseRunEnded(json);
 
-        if (writeJsonFile)
-            WriteJson(json);
-
         if (logSummaryToConsole)
-            Debug.Log($"Telemetry: session={data.sessionId} dur={data.durationSeconds:0.0}s acc={data.accuracy:0.00} kills={data.enemiesKilled} dmgTaken={data.damageTaken:0.##} score={data.skillScore:0.0}");
+            Debug.Log($"Telemetry: dur={data.durationSeconds:0.0}s acc={data.accuracy:0.00} kills={data.enemiesKilled} dmgTaken={data.damageTaken:0.##} score={data.skillScore:0.0}");
     }
 
     private void ComputeDerived()
@@ -143,61 +125,6 @@ public class TelemetryManager : MonoBehaviour
         float dmgPenalty = Mathf.Clamp01(data.damageTakenPerMinute / 200f) * 20f;
 
         data.skillScore = Mathf.Clamp(accScore + kpmScore + survivalScore - dmgPenalty, 0f, 100f);
-    }
-
-    private void WriteJson()
-    {
-        try
-        {
-            string folder = GetOutputFolder();
-            Directory.CreateDirectory(folder);
-
-            string fileName = $"telemetry_{DateTime.UtcNow:yyyyMMdd_HHmmss}_{data.sessionId}.json";
-            string path = Path.Combine(folder, fileName);
-
-            string json = JsonUtility.ToJson(data, true);
-            File.WriteAllText(path, json);
-
-            if (logSummaryToConsole)
-                Debug.Log($"Telemetry written: {path}");
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"Telemetry write failed: {e.Message}");
-        }
-    }
-
-    private void WriteJson(string json)
-    {
-        try
-        {
-            string folder = GetOutputFolder();
-            Directory.CreateDirectory(folder);
-
-            string fileName = $"telemetry_{DateTime.UtcNow:yyyyMMdd_HHmmss}_{data.sessionId}.json";
-            string path = Path.Combine(folder, fileName);
-
-            File.WriteAllText(path, json);
-
-            if (logSummaryToConsole)
-                Debug.Log($"Telemetry written: {path}");
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"Telemetry write failed: {e.Message}");
-        }
-    }
-
-    private string GetOutputFolder()
-    {
-        if (!string.IsNullOrWhiteSpace(outputFolderOverride))
-            return outputFolderOverride;
-
-#if UNITY_EDITOR
-        return Path.GetFullPath(Path.Combine(Application.dataPath, "..", "telemetry"));
-#else
-        return Path.Combine(Application.persistentDataPath, "telemetry");
-#endif
     }
 
     public static void RecordShotFired()

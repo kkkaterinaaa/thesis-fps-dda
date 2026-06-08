@@ -55,6 +55,7 @@ public class RaycastGun : MonoBehaviour
     void Update()
     {
         if (TutorialManager.InputBlocked) return;
+        if (Time.timeScale == 0f) return;
         if (PlayerHealth.IsStunned) return;
 
         if (!isReloading && ammoInMagazine <= 0 && reserveAmmo <= 0)
