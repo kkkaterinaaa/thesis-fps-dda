@@ -7,24 +7,48 @@ public class WeaponSwitcher : MonoBehaviour
     public GameObject slot2;
 
     [Header("Settings")]
-    public int startSlot = 1;
+    public int startSlot = 2;
 
     private int activeSlot;
     public int ActiveSlot => activeSlot;
 
-    void Start()
+    private bool hasPistol = false;
+    public bool HasPistol => hasPistol;
+
+    private bool hasScrolls = false;
+    public bool HasScrolls => hasScrolls;
+    public void MarkScrollsCollected() { hasScrolls = true; }
+
+    void Awake()
     {
-        Equip(startSlot);
+        if (!hasPistol && startSlot == 1)
+            startSlot = 2;
+
+        activeSlot = startSlot;
+        if (slot1 != null) slot1.SetActive(activeSlot == 1);
+        if (slot2 != null) slot2.SetActive(activeSlot == 2);
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) Equip(1);
+        if (TutorialManager.InputBlocked) return;
+
+        if (Input.GetKeyDown(KeyCode.Alpha1) && hasPistol) Equip(1);
         if (Input.GetKeyDown(KeyCode.Alpha2)) Equip(2);
 
         float wheel = Input.mouseScrollDelta.y;
-        if (wheel > 0f) Equip(WrapSlot(activeSlot + 1));
-        if (wheel < 0f) Equip(WrapSlot(activeSlot - 1));
+        if (wheel > 0f)
+        {
+            int next = WrapSlot(activeSlot + 1);
+            if (next == 1 && !hasPistol) next = 2;
+            Equip(next);
+        }
+        if (wheel < 0f)
+        {
+            int next = WrapSlot(activeSlot - 1);
+            if (next == 1 && !hasPistol) next = 2;
+            Equip(next);
+        }
     }
 
     private int WrapSlot(int slot)
@@ -36,9 +60,17 @@ public class WeaponSwitcher : MonoBehaviour
 
     public void Equip(int slot)
     {
+        if (slot == 1 && !hasPistol) return;
+
         activeSlot = Mathf.Clamp(slot, 1, 2);
 
         if (slot1 != null) slot1.SetActive(activeSlot == 1);
         if (slot2 != null) slot2.SetActive(activeSlot == 2);
+    }
+
+    public void UnlockPistol()
+    {
+        hasPistol = true;
+        Equip(1);
     }
 }

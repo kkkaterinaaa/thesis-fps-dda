@@ -28,6 +28,7 @@ public class RaycastGun : MonoBehaviour
     public float projectileSpeed = 45f;
     public float projectileLifetime = 3f;
 
+    public WeaponSwitcher weaponSwitcher;
     public Camera fpsCam;
     float nextFireTime = 0f;
 
@@ -36,8 +37,32 @@ public class RaycastGun : MonoBehaviour
     
     public Crosshair crosshair;
 
+    [Header("Audio")]
+    public AudioClip shootClip;
+    public AudioClip reloadClip;
+    [Range(0f, 1f)] public float shootVolume = 0.9f;
+    [Range(0f, 1f)] public float reloadVolume = 0.8f;
+    private AudioSource audioSource;
+
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 0f;
+    }
+
     void Update()
     {
+        if (TutorialManager.InputBlocked) return;
+        if (PlayerHealth.IsStunned) return;
+
+        if (!isReloading && ammoInMagazine <= 0 && reserveAmmo <= 0)
+        {
+            if (weaponSwitcher != null && weaponSwitcher.ActiveSlot == 1)
+                weaponSwitcher.Equip(2);
+        }
+
         if (!isReloading && ammoInMagazine <= 0 && reserveAmmo > 0)
         {
             StartReload(false);
@@ -67,6 +92,10 @@ public class RaycastGun : MonoBehaviour
         if (ammoInMagazine >= magazineSize) return;
 
         TelemetryManager.RecordReload(manual);
+        if (manual)
+            TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.ManualReload);
+        if (reloadClip != null && audioSource != null)
+            audioSource.PlayOneShot(reloadClip, reloadVolume);
         StartCoroutine(ReloadRoutine());
     }
 
@@ -96,6 +125,9 @@ public class RaycastGun : MonoBehaviour
 
     void Shoot()
     {
+        if (shootClip != null && audioSource != null)
+            audioSource.PlayOneShot(shootClip, shootVolume);
+
         crosshair.AddSpread(6f);
 
         RaycastHit hit;
@@ -106,6 +138,8 @@ public class RaycastGun : MonoBehaviour
             Quaternion spread = Quaternion.Euler(Random.Range(-spreadAngle, spreadAngle), Random.Range(-spreadAngle, spreadAngle), 0f);
             dir = spread * dir;
         }
+
+        TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.KillWithPistol);
 
         if (Physics.Raycast(fpsCam.transform.position, dir, out hit, range, hitMask, QueryTriggerInteraction.Collide))
         {
@@ -118,9 +152,6 @@ public class RaycastGun : MonoBehaviour
 
                 bool isHead = hit.collider != null && hit.collider.CompareTag("Head");
                 TelemetryManager.RecordShotHit(isHead, damage);
-
-                if (h.currentHealth <= 0)
-                    TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.KillWithPistol);
             }
 
             if (hitEffectPrefab != null)

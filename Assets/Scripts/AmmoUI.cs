@@ -10,6 +10,7 @@ public class AmmoUI : MonoBehaviour
 
     [Header("Ammo Display")]
     public TMP_Text ammoText;
+    public TMP_Text reserveText;
     public GameObject ammoRoot;
 
     [Header("Weapon Icon")]
@@ -54,11 +55,16 @@ public class AmmoUI : MonoBehaviour
         if (ammoRoot != null && ammoRoot.activeSelf != isPistol)
             ammoRoot.SetActive(isPistol);
 
-        if (isPistol && gun != null && ammoText != null)
+        if (isPistol && gun != null)
         {
-            int total = gun.GetAmmoInMagazine() + gun.GetReserveAmmo();
-            string suffix = gun.IsReloading() ? "  reloading..." : "";
-            ammoText.text = $"{total}{suffix}";
+            bool reloading = gun.IsReloading();
+            if (ammoText != null)
+            {
+                string suffix = reloading ? " reading..." : "";
+                ammoText.text = $"{gun.GetAmmoInMagazine()} / {gun.GetMagazineSize()}{suffix}";
+            }
+            if (reserveText != null)
+                reserveText.text = $"+{gun.GetReserveAmmo()}";
         }
 
         if (weaponIcon != null)

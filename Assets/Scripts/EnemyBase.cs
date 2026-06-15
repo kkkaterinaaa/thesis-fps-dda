@@ -31,17 +31,37 @@ public abstract class EnemyBase : MonoBehaviour
 
     public EnemyStats stats;
 
+    [Header("Hit Stun")]
+    public float hitStunDuration = 0.2f;
+    private float hitStunTimer;
+
+    [Header("Audio")]
+    public AudioClip shootClip;
+    [Range(0f, 1f)] public float shootVolume = 0.8f;
+    protected AudioSource audioSource;
+
     public virtual void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         var playerGo = GameObject.FindWithTag("Player");
         if (playerGo != null)
             player = playerGo.transform;
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f;
+        audioSource.minDistance = 2f;
+        audioSource.maxDistance = 30f;
+
+        var hp = GetComponent<Health>();
+        if (hp != null) hp.OnDamaged += _ => hitStunTimer = hitStunDuration;
     }
 
     public virtual void Update()
     {
         fireCooldown -= Time.deltaTime;
+        hitStunTimer -= Time.deltaTime;
 
         var patrol = GetComponent<EnemyPatrolPerception>();
         if (patrol != null && !patrol.CanEngage)
@@ -60,15 +80,15 @@ public abstract class EnemyBase : MonoBehaviour
     public void TryShoot()
 {
     if (fireCooldown > 0) return;
-
+    if (hitStunTimer > 0) return;
     if (player == null) return;
 
     float dist = Vector3.Distance(transform.position, player.position);
     if (dist > attackRange) return;
 
-    float aggression = DifficultyState.SpawnIntensity;
-    aggression = Mathf.Clamp(aggression, 0.25f, 4f);
-    fireCooldown = fireRate / aggression;
+    float fireMult = DifficultyState.EnemyFireRateMult;
+    fireMult = Mathf.Clamp(fireMult, 0.25f, 4f);
+    fireCooldown = fireRate / fireMult;
 
     Transform spawn = (muzzle != null) ? muzzle : transform;
     Vector3 aimPoint = player.position + Vector3.up * aimHeight;
@@ -87,25 +107,23 @@ public abstract class EnemyBase : MonoBehaviour
         Destroy(flash, 0.2f);
     }
 
-    RaycastHit[] hits = Physics.RaycastAll(spawn.position, shotDir, attackRange, shootMask, QueryTriggerInteraction.Collide);
-    if (hits != null && hits.Length > 0)
+    if (shootClip != null && audioSource != null)
+        audioSource.PlayOneShot(shootClip, shootVolume);
+
+    RaycastHit hit;
+    if (Physics.Raycast(spawn.position, shotDir, out hit, attackRange, shootMask, QueryTriggerInteraction.Collide))
     {
-        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        SpawnTracer(spawn.position, hit.point);
 
-        SpawnTracer(spawn.position, hits[0].point);
-
-        for (int i = 0; i < hits.Length; i++)
+        var playerHealth = hit.collider.GetComponentInParent<PlayerHealth>();
+        if (playerHealth != null)
         {
-            var playerHealth = hits[i].collider.GetComponentInParent<PlayerHealth>();
-            if (playerHealth == null) continue;
-
-            bool isHead = hits[i].collider.CompareTag("Head");
+            bool isHead = hit.collider.CompareTag("Head");
             float dmgMult = DifficultyState.EnemyDamageMult;
             dmgMult = Mathf.Clamp(dmgMult, 0.1f, 10f);
             float damage = (isHead ? stats.headDamage : stats.bodyDamage) * dmgMult;
             Debug.Log(isHead ? "Enemy HEADSHOT" : "Enemy body hit");
             playerHealth.TakeDamage(damage);
-            break;
         }
     }
     else

@@ -4,6 +4,10 @@ public class MagazinePickup : MonoBehaviour
 {
     public int cartridges = 10;
 
+    [Header("Audio")]
+    public AudioClip pickupClip;
+    [Range(0f, 1f)] public float pickupVolume = 0.9f;
+
     void OnTriggerEnter(Collider other)
     {
         var gun = other.GetComponentInParent<RaycastGun>();
@@ -16,9 +20,27 @@ public class MagazinePickup : MonoBehaviour
 
         if (gun == null) return;
 
-        gun.AddReserveAmmo(cartridges);
-        TelemetryManager.RecordMagazinePickup(cartridges);
+        float mult = Mathf.Clamp(DifficultyState.AmmoDropMult, 0.1f, 10f);
+        int effectiveCartridges = Mathf.Max(1, Mathf.RoundToInt(cartridges * mult));
+        gun.AddReserveAmmo(effectiveCartridges);
+        TelemetryManager.RecordMagazinePickup(effectiveCartridges);
         TutorialManager.CompleteObjective(TutorialManager.ObjectiveType.CollectMagazine);
+        if (pickupClip != null)
+            AudioSource.PlayClipAtPoint(pickupClip, transform.position, pickupVolume);
+
+        var switcher = gun.GetComponentInParent<WeaponSwitcher>();
+        if (switcher == null)
+        {
+            var playerGo = GameObject.FindGameObjectWithTag("Player");
+            if (playerGo != null) switcher = playerGo.GetComponentInChildren<WeaponSwitcher>(true);
+        }
+        if (switcher != null)
+        {
+            switcher.MarkScrollsCollected();
+            if (!switcher.HasPistol && HintUI.Instance != null)
+                HintUI.Instance.Show("Find the magic wand to cast spells");
+        }
+
         Destroy(gameObject);
     }
 }

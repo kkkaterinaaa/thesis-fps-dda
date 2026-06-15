@@ -15,6 +15,10 @@ public class EnemyPatrolPerception : MonoBehaviour
     public float fieldOfView = 120f;
     public LayerMask lineOfSightMask = ~0;
 
+    [Header("Alert (taken damage)")]
+    [Tooltip("How long the enemy stays alerted (engaging) after taking damage, even without line of sight")]
+    public float alertDuration = 8f;
+
     public bool CanEngage => canEngage;
 
     private NavMeshAgent agent;
@@ -25,6 +29,8 @@ public class EnemyPatrolPerception : MonoBehaviour
     private Vector3 roamCenter;
     private Vector3 currentRoamTarget;
     private float combatStoppingDistance;
+    private float alertTimer;
+    private Health health;
 
     void Start()
     {
@@ -37,13 +43,35 @@ public class EnemyPatrolPerception : MonoBehaviour
         currentRoamTarget = transform.position;
         combatStoppingDistance = agent.stoppingDistance;
 
+        health = GetComponent<Health>();
+        if (health != null)
+            health.OnDamaged += OnDamaged;
+
         if (patrolPoints != null && patrolPoints.Length > 0)
             SetDestination(patrolPoints[0].position);
     }
 
+    void OnDestroy()
+    {
+        if (health != null)
+            health.OnDamaged -= OnDamaged;
+    }
+
+    private void OnDamaged(float amount)
+    {
+        alertTimer = alertDuration;
+    }
+
+    public void Alert(float duration)
+    {
+        alertTimer = Mathf.Max(alertTimer, duration);
+    }
+
     void Update()
     {
-        canEngage = CheckEngage();
+        if (alertTimer > 0f) alertTimer -= Time.deltaTime;
+
+        canEngage = CheckEngage() || alertTimer > 0f;
 
         if (canEngage)
         {

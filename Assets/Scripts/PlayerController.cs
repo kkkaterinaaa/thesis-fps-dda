@@ -6,8 +6,18 @@ public class PlayerController : MonoBehaviour
     public float sprintSpeed = 7f;
     public float crouchSpeed = 2f;
     public float mouseSensitivity = 2f;
-    public float jumpHeight = 2f;
-    public float gravity = -9.81f;
+    public float jumpHeight = 1.2f;
+    public float gravity = -20f;
+
+    [Header("Jump feel")]
+    public float coyoteTime = 0.12f;
+    public float jumpBufferTime = 0.12f;
+    [Tooltip("Extra gravity multiplier while falling (>1 makes fall faster than rise)")]
+    public float fallGravityMultiplier = 2f;
+    [Tooltip("If the head hits the ceiling, vertical velocity is zeroed instantly")]
+    public bool cancelJumpOnCeiling = true;
+    private float coyoteTimer;
+    private float jumpBufferTimer;
 
     private CharacterController controller;
     private Camera cam;
@@ -20,17 +30,25 @@ public class PlayerController : MonoBehaviour
     private float crouchHeight = 0.9f;
     private float standHeight = 2f;
 
+    [Header("Audio")]
+    public PlayerAudio playerAudio;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         cam = GetComponentInChildren<Camera>();
-        Cursor.lockState = CursorLockMode.Locked;
+        if (!TutorialManager.InputBlocked)
+            Cursor.lockState = CursorLockMode.Locked;
 
         originalHeight = controller.height;
+
+        if (playerAudio == null) playerAudio = GetComponent<PlayerAudio>();
     }
 
     void Update()
     {
+        if (TutorialManager.InputBlocked) return;
+
         HandleMouseLook();
         HandleMovement();
         HandleActions();
@@ -38,6 +56,13 @@ public class PlayerController : MonoBehaviour
 
     void HandleMouseLook()
     {
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            return;
+        }
+
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
@@ -55,35 +80,52 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = transform.right * x + transform.forward * z;
 
+        bool sprinting = Input.GetKey(KeyCode.LeftShift);
         float currentSpeed = speed;
+        if (sprinting) currentSpeed = sprintSpeed;
+        if (isCrouching) currentSpeed = crouchSpeed;
 
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            currentSpeed = sprintSpeed;
-        }
+        bool grounded = controller.isGrounded;
 
-        if (isCrouching)
-        {
-            currentSpeed = crouchSpeed;
-        }
+        if (grounded) coyoteTimer = coyoteTime;
+        else          coyoteTimer -= Time.deltaTime;
 
-        controller.Move(move * currentSpeed * Time.deltaTime);
+        if (Input.GetButtonDown("Jump")) jumpBufferTimer = jumpBufferTime;
+        else                             jumpBufferTimer -= Time.deltaTime;
 
-        if (controller.isGrounded)
-        {
+        if (grounded && velocity.y < 0f)
             velocity.y = -2f;
 
-            if (Input.GetButtonDown("Jump"))
-            {
-                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            }
-        }
-        else
+        bool jumped = false;
+        if (jumpBufferTimer > 0f && coyoteTimer > 0f)
         {
-            velocity.y += gravity * Time.deltaTime;
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            jumped = true;
+            jumpBufferTimer = 0f;
+            coyoteTimer = 0f;
         }
 
-        controller.Move(velocity * Time.deltaTime);
+        float gravityNow = (velocity.y < 0f) ? gravity * fallGravityMultiplier : gravity;
+        velocity.y += gravityNow * Time.deltaTime;
+
+        Vector3 frameMove = move * currentSpeed + Vector3.up * velocity.y;
+        controller.Move(frameMove * Time.deltaTime);
+
+        if (cancelJumpOnCeiling && (controller.collisionFlags & CollisionFlags.Above) != 0 && velocity.y > 0f)
+            velocity.y = 0f;
+
+        if (playerAudio != null)
+        {
+            float hSpeed = move.magnitude * currentSpeed;
+            PlayerAudio.MotionKind kind;
+            if (hSpeed < 0.1f)       kind = PlayerAudio.MotionKind.Idle;
+            else if (isCrouching)    kind = PlayerAudio.MotionKind.Crouch;
+            else if (sprinting)      kind = PlayerAudio.MotionKind.Sprint;
+            else                     kind = PlayerAudio.MotionKind.Walk;
+
+            playerAudio.TickFootsteps(controller.isGrounded, hSpeed, kind);
+            if (jumped) playerAudio.PlayJump();
+        }
     }
 
     void HandleActions()
@@ -105,27 +147,5 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButton(1))
-        {
-            cam.fieldOfView = 60f;
-        }
-        else
-        {
-            cam.fieldOfView = 90f;
-        }
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Debug.Log("Перезарядка оружия...");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            Debug.Log("Оружие 1 выбрано.");
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            Debug.Log("Оружие 2 выбрано.");
-        }
     }
 }

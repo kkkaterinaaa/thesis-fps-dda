@@ -1,19 +1,19 @@
-using UnityEngine;
+using System.Collections.Generic;
 
 public static class DifficultyState
 {
-    public static float EnemyDamageMult { get; set; } = 1f;
-    public static float EnemyHPMult { get; set; } = 1f;
-    public static float SpawnIntensity { get; set; } = 1f;
-    public static float HealDropMult { get; set; } = 1f;
-    public static float AmmoDropMult { get; set; } = 1f;
+    private static readonly Dictionary<string, float> values = new();
 
-    public static void ResetToDefaults()
-    {
-        EnemyDamageMult = 1f;
-        EnemyHPMult = 1f;
-        SpawnIntensity = 1f;
-        HealDropMult = 1f;
-        AmmoDropMult = 1f;
-    }
+    public static float Get(string key, float defaultValue = 1f)
+        => values.TryGetValue(key, out var v) ? v : defaultValue;
+
+    public static void Set(string key, float value) => values[key] = value;
+
+    public static void ResetToDefaults() => values.Clear();
+
+    public static float EnemyDamageMult => Get("enemyDamageMult");
+    public static float EnemyHPMult     => Get("enemyHPMult");
+    public static float EnemyFireRateMult => Get("enemyFireRateMult");
+    public static float HealDropMult    => Get("healDropMult");
+    public static float AmmoDropMult    => Get("ammoDropMult");
 }
